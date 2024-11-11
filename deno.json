@@ -1,12 +1,13 @@
 {
   "tasks": {
-    "test": "deno test --allow-net",
-    "format": "deno fmt",
-    "lint": "deno lint"
+    "dev": "deno run --allow-net --allow-env --watch --env-file ./src/main.ts",
+    "test": "deno test --allow-net --allow-env --env-file",
+    "database:init": "deno run --allow-write --allow-read --allow-env --allow-ffi --unstable --env-file ./database/create.ts"
   },
   "imports": {
-    "@/": "./",
-    "@routes": "./routes/index.ts",
+    "@/": "./src/",
+    "@routes": "./src/routes/index.ts",
+    "@db/sqlite": "jsr:@db/sqlite@^0.12.0",
     "@hono/hono": "jsr:@hono/hono@^4.6.9",
     "@std/assert": "jsr:@std/assert@1"
   }
