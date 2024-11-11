@@ -1,6 +1,5 @@
+import { archetypes } from "./routes/index.ts";
 import { Hono } from "@hono/hono";
-import { archetypes } from "@routes";
-
 export const app = new Hono();
 
 app.get("/", (c) => {
@@ -9,4 +8,7 @@ app.get("/", (c) => {
 
 app.route("/archetypes", archetypes);
 
-Deno.serve(app.fetch);
+Deno.serve({ 
+  port: Number(Deno.env.get("PORT")),
+  hostname: Deno.env.get("HOSTNAME"),
+}, app.fetch);

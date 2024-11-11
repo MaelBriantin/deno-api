@@ -1,1 +1,0 @@
-export { archetypes, list } from "@/routes/archetypes.ts";
