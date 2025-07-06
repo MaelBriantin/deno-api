@@ -1,0 +1,86 @@
+version: "3"
+
+vars:
+  DOCKER_COMPOSE: "docker compose"
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  ### Initialization Tasks ###
+  init:
+    desc: Initialize the project
+    cmds:
+      - task: dc:build
+      - task: db:migration:migrate
+      - task: db:seed
+
+  ### Docker Compose Tasks ###
+  dc:build:
+    aliases: [build]
+    desc: Build the project
+    cmds:
+      - docker compose up --detach --build
+
+  dc:start:
+    aliases: [start, up]
+    desc: Start the project
+    cmds:
+      - docker compose up --detach
+
+  dc:stop:
+    aliases: [stop, down]
+    desc: Stop the project
+    cmds:
+      - docker compose down --volumes --remove-orphans
+
+  dc:restart:
+    aliases: [restart]
+    desc: Restart the project
+    cmds:
+      - task: dc:stop
+      - task: dc:start
+
+  ### Database Tasks ###
+  db:migration:migrate:
+    desc: Run database migrations
+    cmds:
+      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/migrate.ts
+
+  db:migration:create:
+    desc: "Create a new migration file with the provided table name. Example: `task db:migration:create -- my_table_name`"
+    cmds:
+      - docker compose run --rm deno run --allow-read --allow-write scripts/database/create_migration.ts {{.CLI_ARGS}}
+
+  db:migration:rollback:
+    desc: "Rollback the last migration. Example: `task db:migration:rollback`"
+    cmds:
+      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/rollback.ts {{.CLI_ARGS}}
+
+  db:seed:
+    desc: Seed the database with test users
+    cmds:
+      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/seeder.ts
+
+  ### Deno Tasks ###
+  deno:
+    desc: Run Deno commands
+    cmds:
+      - docker compose run --rm deno {{.CLI_ARGS}}
+
+  deno:fmt:
+    desc: Format Deno code
+    cmds:
+      - docker compose run --rm deno fmt
+
+  deno:lint:
+    desc: Lint Deno code
+    cmds:
+      - docker compose run --rm deno lint
+
+  deno:add:
+    desc: Add a Deno dependency (ajoute l'import dans deno.json)
+    cmds:
+      - docker compose run --rm deno add {{.CLI_ARGS}}

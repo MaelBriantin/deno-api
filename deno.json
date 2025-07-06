@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "dev": "deno run --watch src/main.ts"
+  },
+  "imports": {
+    "@bronti/argon2": "jsr:@bronti/argon2@^1.0.3",
+    "hono": "jsr:@hono/hono@^4.8.4",
+    "@std/assert": "jsr:@std/assert@1",
+    "mysql": "https://deno.land/x/mysql@v2.12.1/mod.ts"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}
