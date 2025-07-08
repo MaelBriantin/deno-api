@@ -19,7 +19,7 @@ services:
     build: .
     working_dir: /app
     volumes:
-      - ./:/app
+      - ./apps/api/:/app
     ports:
       - "8000:8000"
     env_file:

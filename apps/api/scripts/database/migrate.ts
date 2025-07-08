@@ -14,7 +14,8 @@ async function runMigrations() {
 
   // List migration files
   const migrations: string[] = [];
-  for await (const entry of Deno.readDir("./migrations")) {
+  const migrationsDir = './migrations';
+  for await (const entry of Deno.readDir(migrationsDir)) {
     if (entry.isFile && entry.name.endsWith(".sql")) {
       migrations.push(entry.name);
     }
@@ -29,7 +30,7 @@ async function runMigrations() {
 
   for (const migration of migrations) {
     if (!applied.has(migration)) {
-      const sql = await Deno.readTextFile(`./migrations/${migration}`);
+      const sql = await Deno.readTextFile(`${migrationsDir}/${migration}`);
       // Extract the -- up block
       const upMatch = sql.match(/-- up([\s\S]*?)(-- down|$)/i);
       if (!upMatch) {

@@ -81,6 +81,6 @@ tasks:
       - docker compose run --rm deno lint
 
   deno:add:
-    desc: Add a Deno dependency (ajoute l'import dans deno.json)
+    desc: Add a Deno dependency
     cmds:
       - docker compose run --rm deno add {{.CLI_ARGS}}
