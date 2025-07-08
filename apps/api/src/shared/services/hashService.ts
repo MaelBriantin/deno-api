@@ -1,10 +1,11 @@
 import { argon2d } from "@noble/hashes/argon2";
+import { getSalt } from "../config/secret.ts";
 
 const noSaltError =
   "No salt provided. You must provide a salt or set the ARGON2_SALT environment variable.";
 
 export const hash = (password: string, salt?: string): string => {
-  salt = salt || Deno.env.get("ARGON2_SALT");
+  salt = salt || getSalt();
   if (!salt) throw new Error(noSaltError);
   const encoder = new TextEncoder();
   const saltBytes = encoder.encode(salt);
@@ -24,7 +25,7 @@ export const compare = (
   hashedString: string,
   salt?: string,
 ): boolean => {
-  salt = salt || Deno.env.get("ARGON2_SALT");
+  salt = salt || getSalt();
   if (!salt) throw new Error(noSaltError);
   const hashed = hash(string, salt);
   return hashed === hashedString;
