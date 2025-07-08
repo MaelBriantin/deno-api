@@ -1,6 +1,6 @@
 import { Client } from "mysql";
 import { User, UserModel, UserRow } from "./model.ts";
-import { hash as hashPassword } from "../../shared/utils/hashService.ts";
+import { hash as hashPassword } from "../../shared/services/hashService.ts";
 
 export const getAllUsers = async (client: Client): Promise<User[]> => {
   const rows: UserRow[] = await client.query("SELECT * FROM users");
