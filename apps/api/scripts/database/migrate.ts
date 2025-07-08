@@ -14,7 +14,7 @@ async function runMigrations() {
 
   // List migration files
   const migrations: string[] = [];
-  const migrationsDir = './migrations';
+  const migrationsDir = "./migrations";
   for await (const entry of Deno.readDir(migrationsDir)) {
     if (entry.isFile && entry.name.endsWith(".sql")) {
       migrations.push(entry.name);

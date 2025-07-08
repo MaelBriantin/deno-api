@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { Client } from "mysql";
 import * as userController from "./controller.ts";
 

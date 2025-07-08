@@ -11,9 +11,9 @@ services:
     healthcheck:
       test:
         ["CMD-SHELL", "mariadb -uroot -p$MARIADB_ROOT_PASSWORD -e 'SELECT 1'"]
-      interval: 2s
-      timeout: 5s
-      retries: 10
+      interval: 1s
+      timeout: 2s
+      retries: 5
 
   deno:
     build: .

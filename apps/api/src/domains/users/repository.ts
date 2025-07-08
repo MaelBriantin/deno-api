@@ -1,6 +1,6 @@
 import { Client } from "mysql";
 import { User, UserModel, UserRow } from "./model.ts";
-import { hash } from "@bronti/argon2";
+import { hash as hashPassword } from "../../shared/utils/hashService.ts";
 
 export const getAllUsers = async (client: Client): Promise<User[]> => {
   const rows: UserRow[] = await client.query("SELECT * FROM users");
@@ -35,7 +35,7 @@ export const insertUser = async (
   user: User,
   password: string,
 ) => {
-  const hashedPassword = hash(password);
+  const hashedPassword = hashPassword(password);
   await client.execute(
     "INSERT INTO users(id, first_name, last_name, email, password) VALUES(?, ?, ?, ?, ?)",
     [

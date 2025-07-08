@@ -1,8 +1,8 @@
-import { Context } from "hono";
+import { Context } from "@hono/hono";
 import { Client } from "mysql";
 import { getUserByEmail } from "./../users/repository.ts";
 import { getAuthenticationRowByEmail } from "./repository.ts";
-import { verify } from "@bronti/argon2";
+import { compare as checkPassword } from "../../shared/utils/hashService.ts";
 
 export const login = async (c: Context, client: Client) => {
   const { email, password } = await c.req.json();
@@ -16,7 +16,7 @@ export const login = async (c: Context, client: Client) => {
     if (!authRow) {
       return c.json({ error: "User not found" }, 404);
     }
-    const isPasswordValid = verify(password, authRow.password);
+    const isPasswordValid = checkPassword(password, authRow.password);
     if (!isPasswordValid) {
       return c.json({ error: "Invalid credentials" }, 401);
     }

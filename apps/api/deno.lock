@@ -1,18 +1,18 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@bronti/argon2@*": "1.0.3",
-    "jsr:@bronti/argon2@^1.0.3": "1.0.3",
     "jsr:@hono/hono@^4.8.4": "4.8.4",
+    "jsr:@noble/hashes@^1.8.0": "1.8.0",
     "jsr:@std/assert@1": "1.0.13",
-    "jsr:@std/internal@^1.0.6": "1.0.9"
+    "jsr:@std/internal@^1.0.6": "1.0.9",
+    "npm:@noble/hashes@*": "1.8.0"
   },
   "jsr": {
-    "@bronti/argon2@1.0.3": {
-      "integrity": "ddd3614a701e18d41971ff7b6dcd5ced53db294ef81f7b3624e3f2f9fa175352"
-    },
     "@hono/hono@4.8.4": {
       "integrity": "dabc0ea1185040fc1e89abfe29906d9e3dd425a4c40f903f9ead78c48917da06"
+    },
+    "@noble/hashes@1.8.0": {
+      "integrity": "b52a2fcb4d02f8d8137871564a31f1ee9e2b0d15eedabbf32d2f7333f0abc939"
     },
     "@std/assert@1.0.13": {
       "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
@@ -22,6 +22,11 @@
     },
     "@std/internal@1.0.9": {
       "integrity": "bdfb97f83e4db7a13e8faab26fb1958d1b80cc64366501af78a0aee151696eb8"
+    }
+  },
+  "npm": {
+    "@noble/hashes@1.8.0": {
+      "integrity": "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="
     }
   },
   "remote": {
@@ -126,8 +131,8 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@bronti/argon2@^1.0.3",
       "jsr:@hono/hono@^4.8.4",
+      "jsr:@noble/hashes@^1.8.0",
       "jsr:@std/assert@1"
     ]
   }

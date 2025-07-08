@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import { Context } from "@hono/hono";
 import { Client } from "mysql";
 
 export const withDbError = (

@@ -3,8 +3,8 @@
     "dev": "deno run --watch src/main.ts"
   },
   "imports": {
-    "@bronti/argon2": "jsr:@bronti/argon2@^1.0.3",
-    "hono": "jsr:@hono/hono@^4.8.4",
+    "@hono/hono": "jsr:@hono/hono@^4.8.4",
+    "@noble/hashes": "jsr:@noble/hashes@^1.8.0",
     "@std/assert": "jsr:@std/assert@1",
     "mysql": "https://deno.land/x/mysql@v2.12.1/mod.ts"
   },

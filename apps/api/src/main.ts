@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "@hono/hono";
 import { createDbClient } from "./shared/config/db.ts";
 import { createUserRoutes } from "./domains/users/routes.ts";
 import { createAuthRoutes } from "./domains/authentication/routes.ts";

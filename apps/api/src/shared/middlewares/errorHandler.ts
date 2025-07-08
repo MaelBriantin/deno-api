@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import { Context } from "@hono/hono";
 
 export const errorHandler = (err: Error, c: Context) => {
   const debug = Deno.env.get("DEBUG") === "true";
