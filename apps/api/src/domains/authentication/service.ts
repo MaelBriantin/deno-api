@@ -7,22 +7,20 @@ import { getSecretKey } from "../../shared/config/secret.ts";
 
 const SECRET_KEY = getSecretKey();
 
-export const generateJwtToken = (email: string): string => {
-  return jwt.sign({ email }, SECRET_KEY, { expiresIn: "1h" });
-};
-
-export const generateCsrfToken = (): string => {
-  return crypto.randomUUID();
-};
-
-export const isValidCsrfToken = (
-  csrfToken: string | undefined,
-  cookieToken: string | undefined,
-): boolean => {
-  if (!csrfToken || !cookieToken) {
-    return false;
+const getJwtTokenDuration = (): number => {
+  const duration = Deno.env.get("JWT_TOKEN_DURATION");
+  if (!duration) {
+    throw new Error("JWT_TOKEN_DURATION is not defined in the environment variables");
   }
-  return csrfToken === cookieToken;
+  const parsedDuration = parseInt(duration, 10);
+  if (isNaN(parsedDuration) || parsedDuration <= 0) {
+    throw new Error("JWT_TOKEN_DURATION must be a positive integer");
+  }
+  return parsedDuration;
+};
+
+export const generateJwtToken = (email: string): string => {
+  return jwt.sign({ email }, SECRET_KEY, { expiresIn: getJwtTokenDuration() });
 };
 
 export const validateUserCredentials = async (
