@@ -5,10 +5,6 @@ import {
   generateJwtToken,
   validateUserCredentials,
 } from "./service.ts";
-import jwt from "jsonwebtoken";
-import { getSecretKey } from "../../shared/config/secret.ts";
-
-const SECRET_KEY = getSecretKey();
 
 export const login = async (c: Context, client: Client) => {
   const { email, password } = await c.req.json();
