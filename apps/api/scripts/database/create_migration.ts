@@ -1,16 +1,4 @@
-const migrationsDir = "./migrations";
-
-const getTimestamp = () => {
-  const now = new Date();
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  const yyyy = now.getFullYear();
-  const MM = pad(now.getMonth() + 1);
-  const dd = pad(now.getDate());
-  const hh = pad(now.getHours());
-  const mm = pad(now.getMinutes());
-  const ss = pad(now.getSeconds());
-  return `${yyyy}${MM}${dd}_${hh}${mm}${ss}`;
-};
+import { getMigrationFilePath } from "./migration_utils.ts";
 
 const main = async () => {
   const table = Deno.args[0];
@@ -20,10 +8,7 @@ const main = async () => {
     );
     Deno.exit(1);
   }
-  await Deno.mkdir(migrationsDir, { recursive: true });
-  const timestamp = getTimestamp();
-  const filename = `${timestamp}_create_${table}.sql`;
-  const path = `${migrationsDir}/${filename}`;
+  const path = getMigrationFilePath(table, "create");
   const content = `-- Migration: create table ${table}
 
 -- up

@@ -1,4 +1,5 @@
 import { createDbClient } from "../../src/shared/config/db.ts";
+import { getMigrationsDir } from "./migration_utils.ts";
 
 const rollbackMigration = async () => {
   const client = await createDbClient();
@@ -37,7 +38,8 @@ const rollbackMigration = async () => {
     Deno.exit(1);
   }
 
-  const sql = await Deno.readTextFile(`./migrations/${migrationName}`);
+  const migrationsDir = getMigrationsDir();
+  const sql = await Deno.readTextFile(`${migrationsDir}/${migrationName}`);
   // Extract the -- down block
   const downMatch = sql.match(/-- down([\s\S]*)/i);
   if (!downMatch) {

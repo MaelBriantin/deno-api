@@ -44,20 +44,26 @@ tasks:
       - task: dc:start
 
   ### Database Tasks ###
-  db:migration:migrate:
-    desc: Run database migrations
+  db:migration:up:
+      desc: |
+        Run all migrations, or a specific one if an argument is provided. Example: `task db:migration:up -- 20250710_222113_create_refresh_tokens.sql`
+      cmds:
+        - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/migrate.ts {{.CLI_ARGS}}
+
+  db:migration:down:
+    desc: "Rollback the last migration. Example: `task db:migration:down`"
     cmds:
-      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/migrate.ts
+      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/rollback.ts {{.CLI_ARGS}}
 
   db:migration:create:
     desc: "Create a new migration file with the provided table name. Example: `task db:migration:create -- my_table_name`"
     cmds:
       - docker compose run --rm deno run --allow-read --allow-write scripts/database/create_migration.ts {{.CLI_ARGS}}
 
-  db:migration:rollback:
-    desc: "Rollback the last migration. Example: `task db:migration:rollback`"
+  db:migration:update:
+    desc: "Create a new update migration file with the provided description. Example: `task db:migration:update -- 'ajout colonne foo'`"
     cmds:
-      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/rollback.ts {{.CLI_ARGS}}
+      - docker compose run --rm deno run --allow-read --allow-write --allow-env scripts/database/create_update_migration.ts {{.CLI_ARGS}}
 
   db:seed:
     desc: Seed the database with test users

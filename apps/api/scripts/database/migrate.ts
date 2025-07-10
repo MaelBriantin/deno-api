@@ -1,4 +1,5 @@
 import { createDbClient } from "../../src/shared/config/db.ts";
+import { getMigrationsDir } from "./migration_utils.ts";
 
 async function runMigrations() {
   const client = await createDbClient();
@@ -14,7 +15,7 @@ async function runMigrations() {
 
   // List migration files
   const migrations: string[] = [];
-  const migrationsDir = "./migrations";
+  const migrationsDir = getMigrationsDir();
   for await (const entry of Deno.readDir(migrationsDir)) {
     if (entry.isFile && entry.name.endsWith(".sql")) {
       migrations.push(entry.name);
@@ -28,25 +29,56 @@ async function runMigrations() {
     appliedRows.map((r: Record<string, unknown>) => r.name as string),
   );
 
-  for (const migration of migrations) {
-    if (!applied.has(migration)) {
-      const sql = await Deno.readTextFile(`${migrationsDir}/${migration}`);
-      // Extract the -- up block
-      const upMatch = sql.match(/-- up([\s\S]*?)(-- down|$)/i);
-      if (!upMatch) {
-        console.error(`No -- up block found in ${migration}`);
-        continue;
+  // If a specific migration is provided, apply it
+  const migrationArg = Deno.args[0];
+  if (migrationArg) {
+    if (!migrations.includes(migrationArg)) {
+      console.error(`Migration file not found: ${migrationArg}`);
+      await client.close();
+      Deno.exit(1);
+    }
+    if (applied.has(migrationArg)) {
+      console.log(`Migration already applied: ${migrationArg}`);
+      await client.close();
+      return;
+    }
+    const sql = await Deno.readTextFile(`${migrationsDir}/${migrationArg}`);
+    const upMatch = sql.match(/-- up([\s\S]*?)(-- down|$)/i);
+    if (!upMatch) {
+      console.error(`No -- up block found in ${migrationArg}`);
+      await client.close();
+      Deno.exit(1);
+    }
+    const upSql = upMatch[1].trim();
+    if (!upSql) {
+      console.error(`Empty -- up block in ${migrationArg}`);
+      await client.close();
+      Deno.exit(1);
+    }
+    console.log(`Applying migration: ${migrationArg}`);
+    await client.execute(upSql);
+    await client.execute("INSERT INTO migrations(name) VALUES(?)", [migrationArg]);
+  } else {
+    for (const migration of migrations) {
+      if (!applied.has(migration)) {
+        const sql = await Deno.readTextFile(`${migrationsDir}/${migration}`);
+        // Extract the -- up block
+        const upMatch = sql.match(/-- up([\s\S]*?)(-- down|$)/i);
+        if (!upMatch) {
+          console.error(`No -- up block found in ${migration}`);
+          continue;
+        }
+        const upSql = upMatch[1].trim();
+        if (!upSql) {
+          console.error(`Empty -- up block in ${migration}`);
+          continue;
+        }
+        console.log(`Applying migration: ${migration}`);
+        await client.execute(upSql);
+        await client.execute("INSERT INTO migrations(name) VALUES(?)", [
+          migration,
+        ]);
       }
-      const upSql = upMatch[1].trim();
-      if (!upSql) {
-        console.error(`Empty -- up block in ${migration}`);
-        continue;
-      }
-      console.log(`Applying migration: ${migration}`);
-      await client.execute(upSql);
-      await client.execute("INSERT INTO migrations(name) VALUES(?)", [
-        migration,
-      ]);
     }
   }
   await client.close();
