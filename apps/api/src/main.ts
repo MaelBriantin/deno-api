@@ -1,5 +1,5 @@
 import { Hono } from "@hono/hono";
-import { jwt } from '@hono/hono/jwt'
+import { jwt } from "@hono/hono/jwt";
 import { createDbClient } from "./shared/config/db.ts";
 import { createUserRoutes } from "./domains/users/routes.ts";
 import { createAuthRoutes } from "./domains/authentication/routes.ts";

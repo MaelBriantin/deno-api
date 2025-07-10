@@ -1,26 +1,26 @@
+import {
+  getBearerTokenDuration,
+  getSecretKey,
+} from "../../shared/config/secret.ts";
+
+import {
+  deleteRefreshToken,
+  getRefreshTokenByToken,
+  insertRefreshToken,
+} from "./repository.ts";
+
+import { getRefreshTokenDuration } from "../../shared/config/secret.ts";
 import jwt from "jsonwebtoken";
 import { Client } from "mysql";
 import { getAuthenticationRowByEmail } from "./repository.ts";
 import { compare as checkPassword } from "../../shared/services/hashService.ts";
 import { getUserByEmail } from "../users/repository.ts";
-import { getSecretKey } from "../../shared/config/secret.ts";
-
-const SECRET_KEY = getSecretKey();
-
-const getJwtTokenDuration = (): number => {
-  const duration = Deno.env.get("JWT_TOKEN_DURATION");
-  if (!duration) {
-    throw new Error("JWT_TOKEN_DURATION is not defined in the environment variables");
-  }
-  const parsedDuration = parseInt(duration, 10);
-  if (isNaN(parsedDuration) || parsedDuration <= 0) {
-    throw new Error("JWT_TOKEN_DURATION must be a positive integer");
-  }
-  return parsedDuration;
-};
+import { Context } from "@hono/hono";
 
 export const generateJwtToken = (email: string): string => {
-  return jwt.sign({ email }, SECRET_KEY, { expiresIn: getJwtTokenDuration() });
+  return jwt.sign({ email }, getSecretKey(), {
+    expiresIn: getBearerTokenDuration(),
+  });
 };
 
 export const validateUserCredentials = async (
@@ -47,4 +47,57 @@ export const fetchUserByEmail = async (client: Client, email: string) => {
     throw new Error("User not found");
   }
   return user;
+};
+
+export const generateSecureToken = (length = 64) => {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
+};
+
+export const createAndStoreRefreshToken = async (
+  client: Client,
+  context: Context,
+  userId: string,
+) => {
+  const refreshToken = generateSecureToken();
+  const duration = getRefreshTokenDuration();
+  const expiresAt = new Date(Date.now() + duration * 1000);
+  await insertRefreshToken(client, {
+    userId,
+    token: refreshToken,
+    expiresAt,
+  });
+  setRefreshTokenCookie(context, refreshToken, expiresAt);
+};
+
+export const rotateRefreshToken = async (
+  client: Client,
+  context: Context,
+  oldToken: string,
+  userId: string,
+) => {
+  await deleteRefreshToken(client, oldToken);
+  return createAndStoreRefreshToken(client, context, userId);
+};
+
+export const getRefreshTokenData = (client: Client, token: string) => {
+  return getRefreshTokenByToken(client, token);
+};
+
+export const setRefreshTokenCookie = (
+  c: Context,
+  refreshToken: string,
+  expiresAt: Date,
+) => {
+  const maxAge = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
+  c.res.headers.append(
+    "Set-Cookie",
+    `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=${maxAge}`,
+  );
+};
+
+export const getRefreshTokenFromCookie = (c: Context): string | undefined => {
+  const cookie = c.req.header("Cookie");
+  return cookie?.match(/refreshToken=([^;]+)/)?.[1];
 };

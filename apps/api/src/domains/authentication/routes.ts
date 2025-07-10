@@ -6,6 +6,7 @@ export const createAuthRoutes = (client: Client) => {
   const auth = new Hono();
 
   auth.post("/login", (c) => authController.login(c, client));
+  auth.post("/refresh-token", (c) => authController.refreshToken(c, client));
 
   return auth;
 };
