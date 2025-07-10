@@ -101,3 +101,10 @@ export const getRefreshTokenFromCookie = (c: Context): string | undefined => {
   const cookie = c.req.header("Cookie");
   return cookie?.match(/refreshToken=([^;]+)/)?.[1];
 };
+
+export const revokeRefreshTokenCookie = (c: Context) => {
+  c.res.headers.append(
+    "Set-Cookie",
+    "refreshToken=; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=0",
+  );
+};

@@ -1,16 +1,16 @@
 import { Context } from "@hono/hono";
 import { Client } from "mysql";
 import {
+  createAndStoreRefreshToken,
   fetchUserByEmail,
   generateJwtToken,
+  getRefreshTokenData,
+  getRefreshTokenFromCookie,
+  revokeRefreshTokenCookie,
+  rotateRefreshToken,
   validateUserCredentials,
 } from "./service.ts";
-
-import {
-  createAndStoreRefreshToken,
-  getRefreshTokenData,
-  rotateRefreshToken,
-} from "./service.ts";
+import { deleteRefreshToken } from "./repository.ts";
 
 export const login = async (c: Context, client: Client) => {
   const { email, password } = await c.req.json();
@@ -34,9 +34,20 @@ export const login = async (c: Context, client: Client) => {
   }
 };
 
+export const logout = async (c: Context, client: Client) => {
+  const refreshToken = getRefreshTokenFromCookie(c);
+  if (refreshToken) {
+    const dbToken = await getRefreshTokenData(client, refreshToken);
+    if (dbToken) {
+      await deleteRefreshToken(client, refreshToken);
+    }
+  }
+  revokeRefreshTokenCookie(c);
+  return c.json({ message: "Logged out successfully" }, 200);
+};
+
 export const refreshToken = async (c: Context, client: Client) => {
-  const cookie = c.req.header("Cookie");
-  const refreshToken = cookie?.match(/refreshToken=([^;]+)/)?.[1];
+  const refreshToken = getRefreshTokenFromCookie(c);
   if (!refreshToken) {
     return c.json({ error: "No refresh token provided" }, 401);
   }
