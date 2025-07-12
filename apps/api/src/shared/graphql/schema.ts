@@ -11,7 +11,7 @@ interface Context {
   client: Client;
 }
 
-export const yoga = createYoga({
+const schema = createYoga({
   schema: createSchema({
     typeDefs: /* GraphQL */ `
       type User {
@@ -21,25 +21,45 @@ export const yoga = createYoga({
         email: String!
       }
 
+      type UserResponse {
+        user: User
+        error: Error
+      }
+
+      type UsersResponse {
+        users: [User]
+        error: Error
+      }
+
       type Query {
-        users: [User!]!
-        userById(id: ID!): User
-        userByEmail(email: String!): User
+        allUsers: UsersResponse!
+        userById(id: ID!): UserResponse!
+        userByEmail(email: String!): UserResponse!
+      }
+
+      type Error {
+        message: String!
+        code: String
+      }
+
+      type CreateUserResult {
+        data: User
+        error: Error
       }
 
       type Mutation {
-        createUser(firstName: String!, lastName: String!, email: String!, password: String!): User!
+        createUser(firstName: String!, lastName: String!, email: String!, password: String!): CreateUserResult!
       }
     `,
     resolvers: {
       Query: {
-        users: async (_parent, _args, context: Context) => {
-          const users = await getAllUsersService(context.client);
-          return users;
+        allUsers: async (_parent, _args, context: Context) => {
+          const result = await getAllUsersService(context.client);
+          return result;
         },
         userById: async (_parent, { id }: { id: string }, context: Context) => {
-          const user = await getUserByIdService(context.client, id);
-          return user;
+          const result = await getUserByIdService(context.client, id);
+          return result;
         },
         userByEmail: async (
           _parent,
@@ -61,10 +81,11 @@ export const yoga = createYoga({
           },
           context: Context,
         ) => {
-          const user = await createUserService(context.client, userInput);
-          return user;
+          return await createUserService(context.client, userInput);
         },
       },
     },
   }),
 });
+
+export default schema;

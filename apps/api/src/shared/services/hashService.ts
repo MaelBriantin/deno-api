@@ -2,7 +2,10 @@ import { argon2d } from "@noble/hashes/argon2";
 import { randomBytes } from "@noble/hashes/utils";
 import { encodeBase64 } from "@std/encoding/base64";
 
-export const hash = (password: string, salt?: string): { salt: string; hashedPassword: string } => {
+export const hash = (
+  password: string,
+  salt?: string,
+): { salt: string; hashedPassword: string } => {
   salt = salt || generateSalt(16);
   const hashBytes = argon2d(password, salt, {
     t: 2,
@@ -23,5 +26,5 @@ export const compare = (
 };
 
 export const generateSalt = (length: number = 16): string => {
-    return encodeBase64(randomBytes(length));
+  return encodeBase64(randomBytes(length));
 };
