@@ -1,8 +1,8 @@
-import { Client } from "mysql";
 import * as repo from "./repository.ts";
 import { User } from "./model.ts";
 import { hash } from "../../shared/services/hashService.ts";
 import { UserError, UserErrorCode } from "./error.ts";
+import { getClient } from "../../shared/config/db.ts";
 
 interface CreateUserInput {
   firstName: string;
@@ -11,7 +11,8 @@ interface CreateUserInput {
   password: string;
 }
 
-export const getAllUsersService = async (client: Client) => {
+export const getAllUsersService = async () => {
+  const client = await getClient();
   const users = await repo.getAllUsers(client);
   if (!users || users.length === 0) {
     return {
@@ -28,7 +29,8 @@ export const getAllUsersService = async (client: Client) => {
   };
 };
 
-export const getUserByIdService = async (client: Client, id: string) => {
+export const getUserByIdService = async (id: string) => {
+  const client = await getClient();
   const user = await repo.getUserById(client, id);
   if (!user) {
     return {
@@ -45,7 +47,8 @@ export const getUserByIdService = async (client: Client, id: string) => {
   };
 };
 
-export const getUserByEmailService = async (client: Client, email: string) => {
+export const getUserByEmailService = async (email: string) => {
+  const client = await getClient();
   const user = await repo.getUserByEmail(client, email);
   if (!user) {
     return {
@@ -63,9 +66,9 @@ export const getUserByEmailService = async (client: Client, email: string) => {
 };
 
 export const createUserService = async (
-  client: Client,
   { firstName, lastName, email, password }: CreateUserInput,
 ) => {
+  const client = await getClient();
   const validationError = validateUserInput(
     firstName,
     lastName,

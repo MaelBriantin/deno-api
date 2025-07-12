@@ -1,0 +1,14 @@
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+}
+type UserResponse {
+  user: User
+  error: Error
+}
+type UsersResponse {
+  users: [User]
+  error: Error
+}

@@ -9,3 +9,7 @@ export const createDbClient = async () => {
   });
   return client;
 };
+
+export const getClient = async () => {
+  return await createDbClient();
+};

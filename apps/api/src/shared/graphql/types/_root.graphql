@@ -1,0 +1,17 @@
+# This file defines the root GraphQL schema for the application.
+
+# --- Users Domain ---
+type Query {
+  allUsers: UsersResponse!
+  userById(id: ID!): UserResponse!
+  userByEmail(email: String!): UserResponse!
+}
+
+type Mutation {
+  createUser(
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+  ): UserResponse!
+}
