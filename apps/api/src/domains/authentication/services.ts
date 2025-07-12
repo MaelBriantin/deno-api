@@ -33,7 +33,7 @@ export const validateUserCredentials = async (
     throw new Error("User not found");
   }
 
-  const isPasswordValid = checkPassword(password, authRow.password);
+  const isPasswordValid = checkPassword(password, authRow.password, authRow.salt);
   if (!isPasswordValid) {
     throw new Error("Invalid credentials");
   }

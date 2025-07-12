@@ -57,7 +57,9 @@ async function runMigrations() {
     }
     console.log(`Applying migration: ${migrationArg}`);
     await client.execute(upSql);
-    await client.execute("INSERT INTO migrations(name) VALUES(?)", [migrationArg]);
+    await client.execute("INSERT INTO migrations(name) VALUES(?)", [
+      migrationArg,
+    ]);
   } else {
     for (const migration of migrations) {
       if (!applied.has(migration)) {

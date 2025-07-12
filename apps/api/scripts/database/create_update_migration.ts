@@ -3,7 +3,9 @@ import { getMigrationFilePath } from "./migration_utils.ts";
 if (import.meta.main) {
   const [desc] = Deno.args;
   if (!desc) {
-    console.error("Usage: deno run --allow-read --allow-write --allow-env ./scripts/database/create_update_migration.ts <description>");
+    console.error(
+      "Usage: deno run --allow-read --allow-write --allow-env ./scripts/database/create_update_migration.ts <description>",
+    );
     Deno.exit(1);
   }
   const filePath = getMigrationFilePath(desc, "update");

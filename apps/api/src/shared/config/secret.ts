@@ -6,14 +6,6 @@ export const getSecretKey = (): string => {
   return secretKey;
 };
 
-export const getSalt = (): string => {
-  const salt = Deno.env.get("ARGON2_SALT");
-  if (!salt) {
-    throw new Error("ARGON2_SALT is not defined in the environment variables");
-  }
-  return salt;
-};
-
 export const getRefreshTokenDuration = (): number => {
   const duration = Deno.env.get("REFRESH_TOKEN_DURATION");
   if (!duration) {

@@ -9,7 +9,7 @@ import {
   revokeRefreshTokenCookie,
   rotateRefreshToken,
   validateUserCredentials,
-} from "./service.ts";
+} from "./services.ts";
 import { deleteRefreshToken } from "./repository.ts";
 
 export const login = async (c: Context, client: Client) => {

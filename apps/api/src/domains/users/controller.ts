@@ -1,9 +1,14 @@
 import { Context } from "@hono/hono";
 import { Client } from "mysql";
-import * as repo from "./repository.ts";
+import {
+  createUserService,
+  getAllUsersService,
+  getUserByEmailService,
+  getUserByIdService,
+} from "./services.ts";
 
 export const getAllUsers = async (c: Context, client: Client) => {
-  const users = await repo.getAllUsers(client);
+  const users = await getAllUsersService(client);
   if (!users || users.length === 0) {
     return c.json({ message: "No users found" }, 404);
   }
@@ -15,7 +20,7 @@ export const getUserById = async (c: Context, client: Client) => {
   if (!userId) {
     return c.json({ error: "Invalid user ID" }, 400);
   }
-  const user = await repo.getUserById(client, userId);
+  const user = await getUserByIdService(client, userId);
   if (!user) {
     return c.json({ error: "User not found" }, 404);
   }
@@ -27,7 +32,7 @@ export const getUserByEmail = async (c: Context, client: Client) => {
   if (!email) {
     return c.json({ error: "Invalid email" }, 400);
   }
-  const user = await repo.getUserByEmail(client, email);
+  const user = await getUserByEmailService(client, email);
   if (!user) {
     return c.json({ error: "User not found" }, 404);
   }
@@ -48,7 +53,11 @@ export const createUser = async (c: Context, client: Client) => {
   if (!password || typeof password !== "string") {
     return c.json({ error: "Invalid user password" }, 400);
   }
-  const id = crypto.randomUUID();
-  await repo.insertUser(client, { id, firstName, lastName, email }, password);
-  return c.json("User created", 201);
+  const user = await createUserService(client, {
+    firstName,
+    lastName,
+    email,
+    password,
+  });
+  return c.json({ message: "User created successfully", user }, 201);
 };

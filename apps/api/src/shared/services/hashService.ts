@@ -1,32 +1,27 @@
 import { argon2d } from "@noble/hashes/argon2";
-import { getSalt } from "../config/secret.ts";
+import { randomBytes } from "@noble/hashes/utils";
+import { encodeBase64 } from "@std/encoding/base64";
 
-const noSaltError =
-  "No salt provided. You must provide a salt or set the ARGON2_SALT environment variable.";
-
-export const hash = (password: string, salt?: string): string => {
-  salt = salt || getSalt();
-  if (!salt) throw new Error(noSaltError);
-  const encoder = new TextEncoder();
-  const saltBytes = encoder.encode(salt);
-  if (saltBytes.length !== 8) throw new Error("Bad salt length");
-
-  const hashBytes = argon2d(password, saltBytes, {
+export const hash = (password: string, salt?: string): { salt: string; hashedPassword: string } => {
+  salt = salt || generateSalt(16);
+  const hashBytes = argon2d(password, salt, {
     t: 2,
     m: 65536,
     p: 1,
     maxmem: 2 ** 32 - 1,
   });
-  return btoa(String.fromCharCode(...hashBytes));
+  return { salt, hashedPassword: encodeBase64(hashBytes) };
 };
 
 export const compare = (
   string: string,
   hashedString: string,
-  salt?: string,
+  salt: string,
 ): boolean => {
-  salt = salt || getSalt();
-  if (!salt) throw new Error(noSaltError);
-  const hashed = hash(string, salt);
-  return hashed === hashedString;
+  const { hashedPassword } = hash(string, salt);
+  return hashedPassword === hashedString;
+};
+
+export const generateSalt = (length: number = 16): string => {
+    return encodeBase64(randomBytes(length));
 };

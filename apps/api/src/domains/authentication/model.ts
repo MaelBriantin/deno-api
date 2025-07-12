@@ -6,6 +6,7 @@ interface Authentication {
 export interface AuthenticationRow {
   email: string;
   password: string;
+  salt: string;
 }
 
 export class AuthenticationModel implements Authentication {

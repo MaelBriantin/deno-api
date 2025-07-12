@@ -27,23 +27,26 @@ export const getUserByEmail = async (
     "SELECT * FROM users WHERE email = ?",
     [email],
   );
-  return UserModel.fromRow(rows[0]) ?? null;
+  const row = rows[0];
+  return row ? UserModel.fromRow(row) : null;
 };
 
 export const insertUser = async (
   client: Client,
   user: User,
   password: string,
-) => {
-  const hashedPassword = hashPassword(password);
+  salt: string,
+): Promise<User> => {
   await client.execute(
-    "INSERT INTO users(id, first_name, last_name, email, password) VALUES(?, ?, ?, ?, ?)",
+    "INSERT INTO users(id, first_name, last_name, email, password, salt) VALUES(?, ?, ?, ?, ?, ?)",
     [
       user.id,
       user.firstName,
       user.lastName,
       user.email,
-      hashedPassword,
+      password,
+      salt,
     ],
   );
+  return user;
 };

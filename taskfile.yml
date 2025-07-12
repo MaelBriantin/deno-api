@@ -14,7 +14,7 @@ tasks:
     desc: Initialize the project
     cmds:
       - task: dc:build
-      - task: db:migration:migrate
+      - task: db:migration:up
       - task: db:seed
 
   ### Docker Compose Tasks ###
@@ -24,13 +24,13 @@ tasks:
     cmds:
       - docker compose up --detach --build
 
-  dc:start:
+  dc:up:
     aliases: [start, up]
     desc: Start the project
     cmds:
       - docker compose up --detach
 
-  dc:stop:
+  dc:down:
     aliases: [stop, down]
     desc: Stop the project
     cmds:
@@ -40,8 +40,8 @@ tasks:
     aliases: [restart]
     desc: Restart the project
     cmds:
-      - task: dc:stop
-      - task: dc:start
+      - task: dc:down
+      - task: dc:up
 
   ### Database Tasks ###
   db:migration:up:
