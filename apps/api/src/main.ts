@@ -24,6 +24,6 @@ app.all("/graphql", async (c) => {
   return response;
 });
 
-app.route("/users", createUserRoutes(client));
+app.route("/users", createUserRoutes());
 
 Deno.serve(app.fetch);

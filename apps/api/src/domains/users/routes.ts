@@ -1,14 +1,13 @@
 import { Hono } from "@hono/hono";
-import { Client } from "mysql";
 import * as userController from "./controller.ts";
 
-export const createUserRoutes = (client: Client) => {
+export const createUserRoutes = () => {
   const users = new Hono();
 
-  users.get("/", (c) => userController.getAllUsers(c, client));
-  users.get("/:id", (c) => userController.getUserById(c, client));
-  users.get("/:email/email", (c) => userController.getUserByEmail(c, client));
-  users.post("/", (c) => userController.createUser(c, client));
+  users.get("/", (context) => userController.getAllUsers(context));
+  users.get("/:id", (context) => userController.getUserById(context));
+  users.get("/:email/email", (context) => userController.getUserByEmail(context));
+  users.post("/", (context) => userController.createUser(context));
 
   return users;
 };

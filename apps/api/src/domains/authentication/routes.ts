@@ -1,13 +1,12 @@
 import { Hono } from "@hono/hono";
-import { Client } from "mysql";
 import * as authController from "./controller.ts";
 
-export const createAuthRoutes = (client: Client) => {
+export const createAuthRoutes = () => {
   const auth = new Hono();
 
-  auth.post("/login", (c) => authController.login(c, client));
-  auth.post("/logout", (c) => authController.logout(c, client));
-  auth.post("/refresh-token", (c) => authController.refreshToken(c, client));
+  auth.post("/login", (context) => authController.login(context));
+  auth.post("/logout", (context) => authController.logout(context));
+  auth.post("/refresh-token", (context) => authController.refreshToken(context));
 
   return auth;
 };

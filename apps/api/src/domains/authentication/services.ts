@@ -15,9 +15,10 @@ import {
   generateJwtToken,
   generateSecureToken,
 } from "../../shared/services/tokenService.ts";
+import { getClient } from "../../shared/config/db.ts";
 
 export const loginService = async (
-  client: Client,
+  context: Context,
   email: string,
   password: string,
 ) => {
@@ -32,9 +33,11 @@ export const loginService = async (
     };
   }
   try {
-    await validateUserCredentials(client, email, password);
-    const user = await fetchUserByEmail(client, email);
+    const client = await getClient();
+    await validateUserCredentials(email, password, client);
+    const user = await fetchUserByEmail(email, client);
     const token = generateJwtToken(email);
+    await createAndStoreRefreshToken(client, context, user.id);
     return {
       user,
       token,
@@ -61,9 +64,9 @@ export const loginService = async (
 };
 
 export const validateUserCredentials = async (
-  client: Client,
   email: string,
   password: string,
+  client: Client,
 ) => {
   const authRow = await getAuthenticationRowByEmail(client, email);
   if (!authRow) {
@@ -88,7 +91,10 @@ export const validateUserCredentials = async (
   return authRow;
 };
 
-export const fetchUserByEmail = async (client: Client, email: string) => {
+export const fetchUserByEmail = async (email: string, client?: Client) => {
+  if (!client) {
+    client = await getClient();
+  }
   const user = await getUserByEmail(client, email);
   if (!user) {
     throw new AuthenticationError(
@@ -116,17 +122,30 @@ export const createAndStoreRefreshToken = async (
 };
 
 export const rotateRefreshToken = async (
-  client: Client,
   context: Context,
   oldToken: string,
   userId: string,
 ) => {
+  const client = await getClient();
   await deleteRefreshToken(client, oldToken);
   return createAndStoreRefreshToken(client, context, userId);
 };
 
-export const getRefreshTokenData = (client: Client, token: string) => {
+export const getRefreshTokenData = async (token: string, client?: Client) => {
+  if (!client) {
+    client = await getClient();
+  }
   return getRefreshTokenByToken(client, token);
+};
+
+export const deleteRefreshTokenService = async (
+  token: string,
+  client?: Client,
+) => {
+  if (!client) {
+    client = await getClient();
+  }
+  await deleteRefreshToken(client, token);
 };
 
 export const setRefreshTokenCookie = (
