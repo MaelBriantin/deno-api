@@ -1,4 +1,4 @@
-import { createDbClient } from "../../src/shared/config/db.ts";
+import { createDbClient } from "../../src/common/config/db.ts";
 import { getMigrationsDir } from "./migration_utils.ts";
 
 async function runMigrations() {

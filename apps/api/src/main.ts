@@ -1,29 +1,26 @@
 import { Hono } from "@hono/hono";
 // import { jwt } from "@hono/hono/jwt";
-import { createDbClient } from "./shared/config/db.ts";
-import { createUserRoutes } from "./domains/users/routes.ts";
-import { createAuthRoutes } from "./domains/authentication/routes.ts";
-import { errorHandler } from "./shared/middlewares/errorHandler.ts";
-import schema from "./shared/graphql/schema.ts";
-// import { getSecretKey } from "./shared/config/secret.ts";
+import { createUserRoutes } from "./modules/users/api/userRoutes.ts";
+import { createAuthRoutes } from "./modules/authentication/routes.ts";
+import { errorHandler } from "./common/middlewares/errorHandler.ts";
+import schema from "./common/graphql/schema.ts";
+// import { getSecretKey } from "./common/config/secret.ts";
 
 // const secret = getSecretKey();
 
-const client = await createDbClient();
 const app = new Hono();
-const graphqlContext = { client };
 
 app.onError(errorHandler);
 
-app.route("/auth", createAuthRoutes(client));
+app.route("/auth", createAuthRoutes());
 
 // app.use("/*", jwt({ secret }));
 
 app.all("/graphql", async (c) => {
-  const response = await schema.handle(c.req.raw, graphqlContext);
+  const response = await schema.handle(c.req.raw);
   return response;
 });
 
-app.route("/users", createUserRoutes());
+app.route("/users", await createUserRoutes());
 
 Deno.serve(app.fetch);

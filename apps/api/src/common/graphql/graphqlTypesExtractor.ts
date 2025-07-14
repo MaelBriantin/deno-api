@@ -1,10 +1,10 @@
-const graphqlTypeFilePath = "./src/shared/graphql/types/";
+const graphqlTypeFilePath = "./src/common/graphql/types/";
 
 /**
  * Extracts GraphQL type definitions from a list of file objects.
  *
  * Each file object is a mapping from a key to a filename. The function reads the contents
- * of each file located at `./src/shared/graphql/types/{filename}` and returns an object
+ * of each file located at `./src/common/graphql/types/{filename}` and returns an object
  * mapping each key to its corresponding file content.
  *
  * @param files - An array of objects, each mapping keys to filenames.

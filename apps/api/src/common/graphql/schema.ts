@@ -1,5 +1,5 @@
 import { createSchema, createYoga } from "graphql-yoga";
-import { userResolvers } from "../../domains/users/resolver.ts";
+import { userResolvers } from "../../modules/users/api/userResolver.ts";
 import { graphqlTypesExtractor } from "./graphqlTypesExtractor.ts";
 
 const { rootTypes, userTypes, errorTypes } = graphqlTypesExtractor([

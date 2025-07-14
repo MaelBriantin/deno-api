@@ -8,9 +8,9 @@ deleteRefreshTokenService,
   revokeRefreshTokenCookie,
   rotateRefreshToken,
 } from "./services.ts";
-import { generateJwtToken } from "../../shared/services/tokenService.ts";
-import { AuthenticationError } from "./error.ts";
-import { ServerError } from "../../shared/errors/serverError.ts";
+import { generateJwtToken } from "../../common/services/tokenService.ts";
+import { AuthenticationError, AuthenticationErrorCode } from "./error.ts";
+import { ServerError } from "../../common/errors/serverError.ts";
 
 export const login = async (c: Context) => {
   const { email, password } = await c.req.json();
@@ -43,9 +43,18 @@ export const refreshToken = async (c: Context) => {
     return c.json({ error: "Invalid or expired refresh token" }, 401);
   }
 
-  let user;
   try {
-    user = await fetchUserByEmail(dbToken.email);
+    const fetchedUser = await fetchUserByEmail(dbToken.email);
+    const user = fetchedUser.user;
+    if (!user) {
+      throw new AuthenticationError(
+        "User not found",
+        AuthenticationErrorCode.USER_NOT_FOUND,
+      );
+    }
+    await rotateRefreshToken(c, dbToken.token, user.id);
+    const jwtToken = generateJwtToken(user.email);
+    return c.json({ data: null, token: jwtToken, error: null }, 200);
   } catch (error) {
     if (error instanceof AuthenticationError) {
       return c.json({ data: null, error: error.toJson() }, 401);
@@ -55,10 +64,4 @@ export const refreshToken = async (c: Context) => {
       500,
     );
   }
-
-  await rotateRefreshToken(c, dbToken.token, user.id);
-
-  const jwtToken = generateJwtToken(user.email);
-
-  return c.json({ data: null, token: jwtToken, error: null }, 200);
 };

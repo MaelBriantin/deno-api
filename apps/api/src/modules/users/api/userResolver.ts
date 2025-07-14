@@ -1,20 +1,17 @@
-import {
-  createUserService,
-  getAllUsersService,
-  getUserByEmailService,
-  getUserByIdService,
-} from "./services.ts";
+import { getUserService } from "../dependencies.ts";
+
+const userService = await getUserService();
 
 export const userResolvers = {
   Query: {
     allUsers: async () => {
-      return await getAllUsersService();
+      return await userService.getAllUsers();
     },
     userById: async (_parent: unknown, args: { id: string }) => {
-      return await getUserByIdService(args.id);
+      return await userService.getUserById(args.id);
     },
     userByEmail: async (_parent: unknown, args: { email: string }) => {
-      return await getUserByEmailService(args.email);
+      return await userService.getUserByEmail(args.email);
     },
   },
   Mutation: {
@@ -27,7 +24,7 @@ export const userResolvers = {
         password: string;
       },
     ) => {
-      return await createUserService(userInput);
+      return await userService.createUser(userInput);
     },
   },
 };

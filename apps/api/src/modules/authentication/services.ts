@@ -4,18 +4,21 @@ import {
   insertRefreshToken,
 } from "./repository.ts";
 
-import { getRefreshTokenDuration } from "../../shared/config/secret.ts";
+import { getRefreshTokenDuration } from "../../common/config/secret.ts";
 import { Client } from "mysql";
 import { getAuthenticationRowByEmail } from "./repository.ts";
-import { compare as checkPassword } from "../../shared/services/hashService.ts";
-import { getUserByEmail } from "../users/repository.ts";
+import { compare as checkPassword } from "../../common/services/hashService.ts";
 import { Context } from "@hono/hono";
 import { AuthenticationError, AuthenticationErrorCode } from "./error.ts";
 import {
   generateJwtToken,
   generateSecureToken,
-} from "../../shared/services/tokenService.ts";
-import { getClient } from "../../shared/config/db.ts";
+} from "../../common/services/tokenService.ts";
+import { getClient } from "../../common/config/db.ts";
+import { createUserService } from "../users/application/userService.ts";
+import { createUserRepository } from "../users/infrastructure/userRespository.ts";
+
+const userService = createUserService(createUserRepository(await getClient()));
 
 export const loginService = async (
   context: Context,
@@ -35,8 +38,15 @@ export const loginService = async (
   try {
     const client = await getClient();
     await validateUserCredentials(email, password, client);
-    const user = await fetchUserByEmail(email, client);
+    const fetchedUser = await fetchUserByEmail(email, client);
     const token = generateJwtToken(email);
+    const user = fetchedUser.user;
+    if (!user) {
+      throw new AuthenticationError(
+        "User not found",
+        AuthenticationErrorCode.USER_NOT_FOUND,
+      );
+    }
     await createAndStoreRefreshToken(client, context, user.id);
     return {
       user,
@@ -95,7 +105,7 @@ export const fetchUserByEmail = async (email: string, client?: Client) => {
   if (!client) {
     client = await getClient();
   }
-  const user = await getUserByEmail(client, email);
+  const user = await userService.getUserByEmail(email);
   if (!user) {
     throw new AuthenticationError(
       "User not found",

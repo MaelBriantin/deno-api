@@ -1,3 +1,5 @@
+import { UserRow } from "./userRow.ts";
+
 export interface User {
   id: string;
   firstName: string;
@@ -5,15 +7,7 @@ export interface User {
   email: string;
 }
 
-export interface UserRow {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-}
-
-export class UserModel implements User {
+export class User implements User {
   id: string;
   firstName: string;
   lastName: string;
@@ -26,8 +20,8 @@ export class UserModel implements User {
     this.email = data.email ?? "";
   }
 
-  static fromRow(row: UserRow): UserModel {
-    return new UserModel({
+  static fromRow(row: UserRow): User {
+    return new User({
       id: row.id as string,
       firstName: row.first_name as string,
       lastName: row.last_name as string,
@@ -36,4 +30,4 @@ export class UserModel implements User {
   }
 }
 
-export default UserModel;
+export default User;
