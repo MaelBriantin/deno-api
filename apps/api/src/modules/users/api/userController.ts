@@ -1,7 +1,9 @@
 import { Context } from "@hono/hono";
 import { createUserService } from "../application/userService.ts";
 
-export function createUserController(userService: ReturnType<typeof createUserService>) {
+export function createUserController(
+  userService: ReturnType<typeof createUserService>,
+) {
   return {
     getAllUsers: async (c: Context) => {
       const usersResponse = await userService.getAllUsers();

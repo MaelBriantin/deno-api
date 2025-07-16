@@ -1,4 +1,3 @@
-
 import { createDbClient } from "../../src/common/config/db.ts";
 import { getUserService } from "../../src/modules/users/dependencies.ts";
 

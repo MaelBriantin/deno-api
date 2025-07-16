@@ -45,10 +45,10 @@ tasks:
 
   ### Database Tasks ###
   db:migration:up:
-      desc: |
-        Run all migrations, or a specific one if an argument is provided. Example: `task db:migration:up -- 20250710_222113_create_refresh_tokens.sql`
-      cmds:
-        - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/migrate.ts {{.CLI_ARGS}}
+    desc: |
+      Run all migrations, or a specific one if an argument is provided. Example: `task db:migration:up -- 20250710_222113_create_refresh_tokens.sql`
+    cmds:
+      - docker compose run --rm deno run --allow-net --allow-read --allow-env scripts/database/migrate.ts {{.CLI_ARGS}}
 
   db:migration:down:
     desc: "Rollback the last migration. Example: `task db:migration:down`"

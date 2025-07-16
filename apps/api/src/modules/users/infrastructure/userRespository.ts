@@ -1,5 +1,3 @@
-
-
 import { Client } from "mysql";
 import { User } from "../domain/userModel.ts";
 import { UserRow } from "../domain/userRow.ts";

@@ -1,7 +1,7 @@
-import { User } from "../domain/userModel.ts";
-import { UserRepositoryInterface } from "../domain/userRepositoryInterface.ts";
-import { hash } from "../../../common/services/hashService.ts";
-import { UserError, UserErrorCode } from "../../../common/errors/userError.ts";
+import { User } from "#modules/users/domain/userModel.ts";
+import { UserRepositoryInterface } from "#modules/users/domain/userRepositoryInterface.ts";
+import { hash } from "#common/services/hashService.ts";
+import { UserError, UserErrorCode } from "#common/errors/userError.ts";
 
 export interface CreateUserInput {
   firstName: string;
@@ -10,7 +10,7 @@ export interface CreateUserInput {
   password: string;
 }
 
-export function createUserService(repo: UserRepositoryInterface) {
+export const createUserService = (repo: UserRepositoryInterface) => {
   return {
     async getAllUsers() {
       const users = await repo.getAll();
@@ -60,7 +60,9 @@ export function createUserService(repo: UserRepositoryInterface) {
         error: null,
       };
     },
-    async createUser({ firstName, lastName, email, password }: CreateUserInput) {
+    async createUser(
+      { firstName, lastName, email, password }: CreateUserInput,
+    ) {
       const validationError = validateUserInput(
         firstName,
         lastName,
@@ -77,7 +79,10 @@ export function createUserService(repo: UserRepositoryInterface) {
       if (isExistingUser) {
         return {
           user: null,
-          error: new UserError("Email already in use", UserErrorCode.EMAIL_CONFLICT)
+          error: new UserError(
+            "Email already in use",
+            UserErrorCode.EMAIL_CONFLICT,
+          )
             .toJson(),
         };
       }
@@ -92,7 +97,7 @@ export function createUserService(repo: UserRepositoryInterface) {
       return { user };
     },
   };
-}
+};
 
 const validateUserInput = (
   firstName: string,
